@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
    INCLUDE_DIRS urdf 
    CATKIN_DEPENDS xacro
+   gazebo_ros
 )
 
 #############
@@ -39,3 +40,17 @@ install(DIRECTORY launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   FILES_MATCHING PATTERN "*.launch"
 )
+
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+
+find_package(gazebo REQUIRED)
+
+include_directories(${GAZEBO_INCLUDE_DIRS})
+link_directories(${GAZEBO_LIBRARY_DIRS})
+list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
+
+add_library(index_contact SHARED IndexContactPlugin.cc)
+add_library(thumb_contact SHARED ThumbContactPlugin.cc)
+
+target_link_libraries(thumb_contact ${GAZEBO_libraries})
+target_link_libraries(index_contact ${GAZEBO_libraries})
