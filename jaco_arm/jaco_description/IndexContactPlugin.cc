@@ -46,35 +46,37 @@ void IndexContactPlugin::OnUpdate()
   // Get all the contacts.
   msgs::Contacts contacts;
   contacts = this->parentSensor->GetContacts();
-/*
-  std::cout << " Collision between[" << contacts.contact(0).collision1()
-              << "] and [" << contacts.contact(0).collision2() << "]\n";
-
-  std::cout << " Collision between[" << contacts.contact(1).collision1()
-              << "] and [" << contacts.contact(1).collision2() << "]\n";*/
 
   float sum = 0;
 
   for (unsigned int i = 0; i < contacts.contact_size(); ++i)
   {
-    //std::cout << i << " Collision between[" << contacts.contact(i).collision1()
-              //<< "] and [" << contacts.contact(i).collision2() << "]\n";
-
-      sum = sum + contacts.contact(i).wrench(0).body_2_wrench().force().x();
-      
+      sum = sum + contacts.contact(i).wrench(0).body_2_wrench().force().x();   
   }
 
 
-  std_msgs::String msg;
+  std_msgs::Int16 msg;
 
-  std::stringstream force_x;
-  std::stringstream force_y;
-  std::stringstream force_z;
+  float force_x;
   
-  force_x <<  (sum/contacts.contact_size());
-  msg.data = force_x.str();
-  chatter_pub.publish(msg);
+  if(sum == 0){
+    force_x = 0;
+  }
+  
+  else{
+    force_x = (sum/contacts.contact_size());
+  }
 
-  //std::cout << i << "HEEEEY! " << contacts.contact(i).wrench(0).body_2_wrench().force().x() << "\n";
+  int hap;
+
+  if (force_x == 0){
+    hap = 0;
+  }
+  else{
+    hap = force_x*255/130;
+  }
+
+  msg.data = abs(hap);
+  chatter_pub.publish(msg);
 
 }

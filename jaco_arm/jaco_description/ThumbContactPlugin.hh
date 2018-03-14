@@ -6,7 +6,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
 #include "ros/ros.h"
-#include "std_msgs/String.h"
+#include "std_msgs/Int16.h"
 
 
 namespace gazebo
@@ -37,7 +37,7 @@ namespace gazebo
 
     private:
       ros::NodeHandle n;
-      ros::Publisher chatter_pub = n.advertise<std_msgs::String>("thumbContact", 1000);
+      ros::Publisher chatter_pub = n.advertise<std_msgs::Int16>("haptic_thumb", 1000);
   };
 }
 #endif

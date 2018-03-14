@@ -51,6 +51,8 @@ list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 add_library(index_contact SHARED IndexContactPlugin.cc)
 add_library(thumb_contact SHARED ThumbContactPlugin.cc)
+add_library(middle_contact SHARED MiddleContactPlugin.cc)
 
-target_link_libraries(thumb_contact ${GAZEBO_libraries})
 target_link_libraries(index_contact ${GAZEBO_libraries})
+target_link_libraries(thumb_contact ${GAZEBO_libraries})
+target_link_libraries(middle_contact ${GAZEBO_libraries})

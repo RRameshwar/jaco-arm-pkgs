@@ -1,25 +1,24 @@
-#ifndef _GAZEBO_INDEX_CONTACT_PLUGIN_HH_
-#define _GAZEBO_INDEX_CONTACT_PLUGIN_HH_
+#ifndef _GAZEBO_MIDDLE_CONTACT_PLUGIN_HH_
+#define _GAZEBO_MIDDLE_CONTACT_PLUGIN_HH_
 
 #include <string>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
 #include "ros/ros.h"
-#include "std_msgs/String.h"
 #include "std_msgs/Int16.h"
 
 
 namespace gazebo
 {
   /// \brief An example plugin for a contact sensor.
-  class IndexContactPlugin : public SensorPlugin
+  class MiddleContactPlugin : public SensorPlugin
   {
     /// \brief Constructor.
-    public: IndexContactPlugin();
+    public: MiddleContactPlugin();
 
     /// \brief Destructor.
-    public: virtual ~IndexContactPlugin();
+    public: virtual ~MiddleContactPlugin();
 
     /// \brief Load the sensor plugin.
     /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
@@ -38,7 +37,7 @@ namespace gazebo
 
     private:
       ros::NodeHandle n;
-      ros::Publisher chatter_pub = n.advertise<std_msgs::Int16>("haptic_pointer", 1000);
+      ros::Publisher chatter_pub = n.advertise<std_msgs::Int16>("haptic_middle", 1000);
   };
 }
 #endif

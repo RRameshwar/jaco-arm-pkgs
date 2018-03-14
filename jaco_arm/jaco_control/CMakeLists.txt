@@ -134,7 +134,11 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-add_executable(jaco_control_node src/control_node.cpp)
+#add_executable(jaco_finger_control_node src/finger_control_node.cpp)
+
+add_executable(jaco_full_control_node src/full_control_node.cpp)
+add_executable(calibration_node src/calibration_node.cpp)
+add_executable(finger_calibration_node src/finger_calibration_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -147,10 +151,15 @@ add_executable(jaco_control_node src/control_node.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(jaco_control_node
+target_link_libraries(jaco_full_control_node 
   ${catkin_LIBRARIES}
 )
-
+target_link_libraries(calibration_node 
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(finger_calibration_node 
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############

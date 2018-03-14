@@ -1,20 +1,20 @@
-#include "ThumbContactPlugin.hh"
+#include "MiddleContactPlugin.hh"
 
 using namespace gazebo;
-GZ_REGISTER_SENSOR_PLUGIN(ThumbContactPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(MiddleContactPlugin)
 
 /////////////////////////////////////////////////
-ThumbContactPlugin::ThumbContactPlugin() : SensorPlugin()
+MiddleContactPlugin::MiddleContactPlugin() : SensorPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-ThumbContactPlugin::~ThumbContactPlugin()
+MiddleContactPlugin::~MiddleContactPlugin()
 {
 }
 
 /////////////////////////////////////////////////
-void ThumbContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
+void MiddleContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
 
   
@@ -28,20 +28,20 @@ void ThumbContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
   {
-    gzerr << "ThumbContactPlugin requires a ContactSensor.\n";
+    gzerr << "MiddleContactPlugin requires a ContactSensor.\n";
     return;
   }
 
   // Connect to the sensor update event.
   this->updateConnection = this->parentSensor->ConnectUpdated(
-      boost::bind(&ThumbContactPlugin::OnUpdate, this));
+      boost::bind(&MiddleContactPlugin::OnUpdate, this));
 
   // Make sure the parent sensor is active.
   this->parentSensor->SetActive(true);
 }
 
 /////////////////////////////////////////////////
-void ThumbContactPlugin::OnUpdate()
+void MiddleContactPlugin::OnUpdate()
 {
   msgs::Contacts contacts;
   contacts = this->parentSensor->GetContacts();
@@ -56,6 +56,8 @@ void ThumbContactPlugin::OnUpdate()
 
   std_msgs::Int16 msg;
 
+  std::cout << sum << std::endl;
+
   float force_x;
   
   if(sum == 0){
@@ -65,6 +67,8 @@ void ThumbContactPlugin::OnUpdate()
   else{
     force_x = (sum/contacts.contact_size());
   }
+
+  std::cout << force_x << std::endl;
 
   int hap;
 
