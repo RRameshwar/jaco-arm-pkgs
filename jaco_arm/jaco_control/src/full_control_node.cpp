@@ -7,6 +7,8 @@
 #include <sstream>
 #include <cmath>
 
+#define PI 3.14159265
+
 class JacoFingerControl {
 public:
 	ros::NodeHandle n;
@@ -36,8 +38,10 @@ public:
 	bool IMUcalibrated;
 	bool fingerCalibrated;
 
-	float upperX;
-	float upperY;
+	float imu3x;
+	float imu3y;
+	float imu2x;
+	float imu2y;
 
 	JacoFingerControl(){
 		
@@ -72,7 +76,7 @@ public:
         pos.position.push_back(-0.83 - (3.1415/4));
         pos.position.push_back(0.0);
         pos.position.push_back(-1.6);
-        pos.position.push_back(0.03);
+        pos.position.push_back(0.03 + (3.14/2));
         pos.position.push_back(-3.14);
         pos.position.push_back(-0.05);
 
@@ -93,7 +97,7 @@ public:
         jointHomes.push_back(-0.83 - (3.1415/4));
         jointHomes.push_back(0.0);
         jointHomes.push_back(-1.6);
-        jointHomes.push_back(0.03);
+        jointHomes.push_back(0.03 + (3.14/2));
         jointHomes.push_back(-3.14);
         jointHomes.push_back(-0.05);
 
@@ -108,9 +112,8 @@ public:
         	fingerOffsets.data.push_back(0.0);
         }
 
-        upperX = 0;
-        upperY = 0;
-
+        imu3x = 0;
+        imu3y = 0;
 	}
 
 	float calculateAvg(std::list<float> list)
@@ -134,8 +137,8 @@ public:
 		std::cout << "Upper IMU Limit " << sensor_range[1] << std::endl; 
 
 		std::cout << "Value Read " << value << std::endl;
-		std::cout << "Value Mapped " << num << std::endl;*/
-
+		std::cout << "Value Mapped " << num << std::endl;
+*/
 		if (num > joint_range[1])
 			{
 				return  joint_range[1];
@@ -205,30 +208,25 @@ public:
 
 		float ansz = map(z, jointHomes[4], zrange, zJointrange);
 
-		pos.position[4]=ansz;
+		//pos.position[4]=ansz;
 	}
 
 	void ForearmPosCallback(const geometry_msgs::Vector3& msg){
 		float x = msg.x - IMUoffsets.data[3];
 		float y = msg.y - IMUoffsets.data[4];
 
-		float x0 = upperX;
-		float y0 = upperY;
+		imu2x = x;
+		imu2y = y;
+
+		float x0 = imu3x;
+		float y0 = imu3y;
 
 		if (x >= 180){
 			x = x - 360;
 		}
 
-		if (y >= 180){
-			y = y - 360;
-		}
-
 		if (x0 >= 180){
 			x0 = x0 - 360;
-		}
-
-		if (y0 >= 180){
-			y0 = y0 - 360;
 		}
 
 		std::vector<int> yrange;
@@ -236,16 +234,36 @@ public:
 		yrange.push_back(-65); //arm down
 
 		std::vector<float> rangeJoint2;
-		rangeJoint2.push_back(jointHomes[2]);
-		rangeJoint2.push_back(jointHomes[2]+1.5);
+		rangeJoint2.push_back(jointHomes[2]-1);
+		rangeJoint2.push_back(jointHomes[2]+2.7);
 
 		float num = (x - x0) /*+ (y - y0)*/;
-
-		std::cout << "DIFFERENCE: " << x - x0 << std::endl;
 
 		float ans_joint2 = map(num, jointHomes[2], yrange, rangeJoint2);
 
 		pos.position[2]= ans_joint2;
+	}
+
+	std::vector<float> forwardKinematics(float x1, float y1, float x2, float y2){
+		float a1 = 300;
+		float a2 = 280;
+
+		x1 = x1 * PI/180;
+		y1 = y1 * PI/180;
+		x2 = x2 * PI/180;
+		y2 = y2 * PI/180;
+
+ 		float y =  a1*cos(x1)*cos(y1) + a2*cos(x2)*cos(y2);
+ 		float z =  (a1*sin(y1) + a2*sin(y2))*-1;
+
+ 		std::cout << "Y: " << y << " Z: " << z << std::endl; 
+
+ 		std::vector<float> v;
+ 		v.push_back(y);
+ 		v.push_back(z);
+
+ 		return v;
+
 	}
 
 	void UpperarmPosCallback(const geometry_msgs::Vector3& msg){
@@ -253,42 +271,33 @@ public:
 		float y = msg.y - IMUoffsets.data[1] + 180;
 		float z = msg.z - IMUoffsets.data[2] + 180;
 
-		upperY = msg.y - IMUoffsets.data[1];
-		upperX = msg.x - IMUoffsets.data[0];
+		imu3x = x;
+		imu3y = y;
+
+		//pos.position[1] = imu3x;
+
+		//pos.position[2] = imu2x - imu3x;
+		//pos.position[0] = atan2(physicalZ, physicalY)
 
 		std::vector<int> xrange;
-		//std::cout << "X OFFSET" <<IMUoffsets.data[0] << std::endl;
-		xrange.push_back(-45); //40, 130
-		xrange.push_back(45);
+		xrange.push_back(-35); //40, 130
+		xrange.push_back(35);
 
-		std::vector<int> yrange;
-		yrange.push_back(-52 +180); //45, -60
-		yrange.push_back(+52 +180);
-
-		std::vector<int> zrange;
-		zrange.push_back(IMUoffsets.data[2] - 15 +180); //5, -25
-		zrange.push_back(IMUoffsets.data[2] + 15 +180);
+		std::vector<int> yzrange;
 
 		std::vector<float> rangeJoint0;
 		rangeJoint0.push_back(jointHomes[0]-1);
 		rangeJoint0.push_back(jointHomes[0]+1);
 
 		std::vector<float> rangeJoint1;
-		rangeJoint1.push_back(jointHomes[1]-.7);
+		rangeJoint1.push_back(jointHomes[1]-1.3);
 		rangeJoint1.push_back(jointHomes[1]+.7);
 
-		float ans_joint0 = map((xrange[1]-x), jointHomes[0], xrange, rangeJoint0);
+		std::vector<float> cart = forwardKinematics(x, y, imu2x, imu2y);
+		float num = atan2(cart[1], cart[0]);
 
-		float yzrangemin = sqrt(pow(yrange[0],2)+pow(zrange[0],2)); // = 7.8
-		float yzrangemax = sqrt(pow(yrange[1],2)+pow(zrange[1],2)); // = 69.6
-
-		std::vector<int> yzrange;
-		yzrange.push_back(yzrangemin);
-		yzrange.push_back(yzrangemax);
-		
-		float num = sqrt(pow(y,2)+pow(z,2));
-
-		float ans_joint1 = map(y, jointHomes[1], yrange, rangeJoint1);
+		float ans_joint0 = num;
+		float ans_joint1 = map((xrange[1] - x), jointHomes[1], xrange, rangeJoint1);
 
 		pos.position[0]=ans_joint0;
 		pos.position[1]=ans_joint1;
@@ -327,7 +336,7 @@ int main(int argc, char **argv)
 
     //jc.joint_pub.publish(jc.pos);
 
-    if (jc.IMUcalibrated and jc.fingerCalibrated){
+    if (jc.IMUcalibrated /*and jc.fingerCalibrated*/){
     	jc.joint_pub.publish(jc.pos);
     	//std::cout << "publishing" << std::endl;
     }
