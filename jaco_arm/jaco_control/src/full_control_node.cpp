@@ -69,11 +69,11 @@ public:
         pos.position.push_back(1.5064013197669412);
         pos.position.push_back(3.135943485311694);*/
 
-        pos.position.push_back(-0.83);
+        pos.position.push_back(-0.83 - (3.1415/4));
         pos.position.push_back(0.0);
         pos.position.push_back(-1.6);
-        pos.position.push_back(-2.36);
-        pos.position.push_back(0.99);
+        pos.position.push_back(0.03);
+        pos.position.push_back(-3.14);
         pos.position.push_back(-0.05);
 
         pos.position.push_back(0);
@@ -90,11 +90,11 @@ public:
         jointHomes.push_back(1.5064013197669412);
         jointHomes.push_back(3.135943485311694);*/
 
-        jointHomes.push_back(-0.83);
+        jointHomes.push_back(-0.83 - (3.1415/4));
         jointHomes.push_back(0.0);
         jointHomes.push_back(-1.6);
-        jointHomes.push_back(-2.36);
-        jointHomes.push_back(0.99);
+        jointHomes.push_back(0.03);
+        jointHomes.push_back(-3.14);
         jointHomes.push_back(-0.05);
 
         IMUcalibrated = false;
@@ -127,7 +127,7 @@ public:
 		if(value == 0){return home;}
 		float num = (((value-sensor_range[0])/(sensor_range[1]-sensor_range[0]))*(joint_range[1]-joint_range[0]))+joint_range[0];
 
-		/*std::cout << "Lower Joint Limit " << joint_range[0] << std::endl; 
+/*		std::cout << "Lower Joint Limit " << joint_range[0] << std::endl; 
 		std::cout << "Upper Joint Limit " << joint_range[1] << std::endl;
 
 		std::cout << "Lower IMU Limit " << sensor_range[0] << std::endl; 
@@ -138,18 +138,14 @@ public:
 
 		if (num > joint_range[1])
 			{
-				//std::cout << "Past upper limit " << num << std::endl;
 				return  joint_range[1];
 			}
 		else if (num < joint_range[0])
 			{
-				//std::cout << "Past lower limit " << num << std::endl;
 				return  joint_range[0];
 			}
-		//std::cout << "NEW NUM " << num << std::endl;
 		else
 			{
-				//std::cout << "Within range " << num << std::endl;
 				return num;
 			}
 	}
@@ -204,16 +200,11 @@ public:
 		yJointrange.push_back(jointHomes[6]+1);
 
 		std::vector<float> zJointrange;
-		zJointrange.push_back(-1);
-		zJointrange.push_back(1);
+		zJointrange.push_back(-3.14);
+		zJointrange.push_back(-1.68);
 
-		//float ansx = map(x, jointHomes[3], xrange, xJointrange);
-		//float ansy = map(y, jointHomes[4], yrange, yJointrange);
 		float ansz = map(z, jointHomes[4], zrange, zJointrange);
-		//std::cout << x << std::endl;
-		//std::cout << ans << std::endl;
-		//pos.position[3]=ansx;
-		//pos.position[4]=ansy;
+
 		pos.position[4]=ansz;
 	}
 
@@ -221,24 +212,40 @@ public:
 		float x = msg.x - IMUoffsets.data[3];
 		float y = msg.y - IMUoffsets.data[4];
 
+		float x0 = upperX;
+		float y0 = upperY;
+
+		if (x >= 180){
+			x = x - 360;
+		}
+
+		if (y >= 180){
+			y = y - 360;
+		}
+
+		if (x0 >= 180){
+			x0 = x0 - 360;
+		}
+
+		if (y0 >= 180){
+			y0 = y0 - 360;
+		}
+
 		std::vector<int> yrange;
-		yrange.push_back(15); //arm up
-		yrange.push_back(-45); //arm down
+		yrange.push_back(-3); //arm up
+		yrange.push_back(-65); //arm down
 
 		std::vector<float> rangeJoint2;
-		rangeJoint2.push_back(jointHomes[2]-1);
-		rangeJoint2.push_back(jointHomes[2]+1);
+		rangeJoint2.push_back(jointHomes[2]);
+		rangeJoint2.push_back(jointHomes[2]+1.5);
 
-		
-		//float num = sqrt(pow((upperX - x), 2)+pow((upperY - y),2));
-		//float num = sqrt(pow(upperX,2)+pow(upperY, 2)) - sqrt(pow(x,2)+pow(y, 2));
-		//float num = 0;
+		float num = (x - x0) /*+ (y - y0)*/;
 
-		float ans_joint2 = map((upperY - y), jointHomes[2], yrange, rangeJoint2);
+		std::cout << "DIFFERENCE: " << x - x0 << std::endl;
 
-		//std::cout << "Joint 2 " << ans_joint2 << std::endl;
+		float ans_joint2 = map(num, jointHomes[2], yrange, rangeJoint2);
 
-		//pos.position[2]= ans_joint2;
+		pos.position[2]= ans_joint2;
 	}
 
 	void UpperarmPosCallback(const geometry_msgs::Vector3& msg){
@@ -247,6 +254,7 @@ public:
 		float z = msg.z - IMUoffsets.data[2] + 180;
 
 		upperY = msg.y - IMUoffsets.data[1];
+		upperX = msg.x - IMUoffsets.data[0];
 
 		std::vector<int> xrange;
 		//std::cout << "X OFFSET" <<IMUoffsets.data[0] << std::endl;
@@ -280,15 +288,10 @@ public:
 		
 		float num = sqrt(pow(y,2)+pow(z,2));
 
-		//std::cout << "X: " << x << std::endl;
-
 		float ans_joint1 = map(y, jointHomes[1], yrange, rangeJoint1);
 
-		//std::cout << "Offset " << IMUoffsets.data[1] << std::endl;
-		//std::cout << "Joint 0: " << ans_joint0 << std::endl;
-
-		//pos.position[0]=ans_joint0;
-		//pos.position[1]=ans_joint1;
+		pos.position[0]=ans_joint0;
+		pos.position[1]=ans_joint1;
 	}
 
 	void FingersPosCallback(const geometry_msgs::Vector3& msg){
@@ -322,7 +325,9 @@ int main(int argc, char **argv)
   {
     ros::spinOnce();
 
-    if (jc.IMUcalibrated /*and*/ /*jc.fingerCalibrated*/){
+    //jc.joint_pub.publish(jc.pos);
+
+    if (jc.IMUcalibrated and jc.fingerCalibrated){
     	jc.joint_pub.publish(jc.pos);
     	//std::cout << "publishing" << std::endl;
     }
