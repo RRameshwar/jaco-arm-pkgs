@@ -23,7 +23,7 @@ void IndexContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf
 
   // Get the parent sensor.
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
 
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
@@ -45,7 +45,7 @@ void IndexContactPlugin::OnUpdate()
 {
   // Get all the contacts.
   msgs::Contacts contacts;
-  contacts = this->parentSensor->GetContacts();
+  contacts = this->parentSensor->Contacts();
 
   float sum = 0;
 

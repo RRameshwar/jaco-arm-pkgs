@@ -23,7 +23,7 @@ void MiddleContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sd
 
   // Get the parent sensor.
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
 
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
@@ -43,8 +43,9 @@ void MiddleContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sd
 /////////////////////////////////////////////////
 void MiddleContactPlugin::OnUpdate()
 {
+  // Get all the contacts.
   msgs::Contacts contacts;
-  contacts = this->parentSensor->GetContacts();
+  contacts = this->parentSensor->Contacts();
 
   float sum = 0;
 
@@ -56,8 +57,6 @@ void MiddleContactPlugin::OnUpdate()
 
   std_msgs::Int16 msg;
 
-  std::cout << sum << std::endl;
-
   float force_x;
   
   if(sum == 0){
@@ -67,8 +66,6 @@ void MiddleContactPlugin::OnUpdate()
   else{
     force_x = (sum/contacts.contact_size());
   }
-
-  std::cout << force_x << std::endl;
 
   int hap;
 

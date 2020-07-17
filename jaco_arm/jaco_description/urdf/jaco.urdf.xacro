@@ -703,7 +703,6 @@
       </geometry>
     </collision>
   </link>
-
     <joint name="${jaco_prefix}_arm_4_joint" type="continuous"> 
   <xacro:arm_4_limits/> 
      <xacro:default_damping_low/>
@@ -739,7 +738,6 @@
       </geometry>
     </collision>
   </link>
-
     <joint name="${jaco_prefix}_ring_6_joint" type="fixed">
     <origin xyz="-0.06590490 -0.034307921 0" rpy="${M_PI_2} 0 2.53072741539211 " />
         <parent link="${jaco_prefix}_5_lowerwrist_limb" />
@@ -768,14 +766,13 @@
       </material>
     </visual>
      <xacro:testSphere/>
-    <collision name = "limb_collision">
+    <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
         <mesh filename="package://jaco_description/meshes/jaco2/6_hand_limb.STL" scale="${wrist_scale_x} ${wrist_scale_y} ${wrist_scale_z}"/>
       </geometry>
     </collision>
   </link>
-
     <joint name="${jaco_prefix}_arm_5_joint" type="continuous"> 
       <xacro:arm_5_limits/> 
      <xacro:default_damping_low/>
@@ -802,7 +799,7 @@
 
  
   <!-- ...........................  -->
-  <!--             FINGERS          -->
+  <!--      FINGERS          -->
   <!-- ...........................  -->
 
    
@@ -855,7 +852,7 @@
         <color rgba="0.50 0.50 0.50 1" />
       </material>
     </visual>
-    <collision name = "index_collision">
+    <collision>
       <origin xyz="0 0 0" rpy="${M_PI} ${M_PI_4+M_PI_4/2.0} 0" />
       <geometry>
         <mesh filename="package://jaco_description/meshes/jaco2/8_finger_index.STL" />
@@ -865,14 +862,14 @@
 
   <gazebo reference="${jaco_prefix}_8_finger_index">
     <sensor name='index_contact' type='contact'>
-    	<plugin name="my_plugin" filename="libindex_contact.so"/>
+      <plugin name="my_plugin" filename="libindex_contact.so" />
         <contact>
-        	<collision>${jaco_prefix}_8_finger_index_collision</collision>
+          <collision>${jaco_prefix}_8_finger_index_collision</collision>
         </contact>
-        <update_rate> 5 </update_rate>
+        <update_rate> 50 </update_rate>
     </sensor>
   </gazebo>
-    
+
     <joint name="${jaco_prefix}_finger_joint_0" type="revolute">
      <xacro:damping_fingers/>
     <origin xyz="${f_idx_xyz}" rpy="${f_idx_rpy}" />
@@ -908,7 +905,6 @@
       </geometry>
     </collision>
   </link>
-
     <joint name="${jaco_prefix}_finger_joint_1" type="fixed">
      <xacro:damping_fingers/>
     <origin xyz="0 0 0.0441" rpy="0 0 0" />
@@ -969,7 +965,7 @@
         <color rgba="0.5 0.5 0.5 1" />
       </material>
     </visual>
-    <collision name = "thumb_collision">
+    <collision>
       <origin xyz="0 0 0" rpy="${M_PI} ${M_PI_4+M_PI_4/2.0} 0" />
       <geometry>
         <mesh filename="package://jaco_description/meshes/jaco2/8_finger_thumb.STL" />
@@ -977,16 +973,15 @@
     </collision>
   </link>
 
-    <gazebo reference="${jaco_prefix}_8_finger_thumb">
+  <gazebo reference="${jaco_prefix}_8_finger_thumb">
     <sensor name='thumb_contact' type='contact'>
-    	<plugin name="thumb_plugin" filename="libthumb_contact.so"/>
+      <plugin name="thumb_plugin" filename="libthumb_contact.so"/>
         <contact>
-        	<collision>${jaco_prefix}_8_finger_thumb_collision</collision>
+          <collision>${jaco_prefix}_8_finger_thumb_collision</collision>
         </contact>
-        <update_rate> 5 </update_rate>
+        <update_rate> 50 </update_rate>
     </sensor>
   </gazebo>
-
 
     <joint name="${jaco_prefix}_finger_joint_2" type="revolute">
      <xacro:damping_fingers/>
@@ -1076,7 +1071,7 @@
         <color rgba="0.5 0.5 0.5 1" />
       </material>
     </visual>
-    <collision name = "pinkie_collision">
+    <collision>
       <origin xyz="0 0 0" rpy="${M_PI} ${M_PI_4+M_PI_4/2.0} 0" />
       <geometry>
         <mesh filename="package://jaco_description/meshes/jaco2/8_finger_pinkie.STL" />
@@ -1090,10 +1085,10 @@
         <contact>
           <collision>${jaco_prefix}_8_finger_pinkie_collision</collision>
         </contact>
-        <update_rate> 5 </update_rate>
+        <update_rate> 50 </update_rate>
     </sensor>
   </gazebo>
-
+  
     <joint name="${jaco_prefix}_finger_joint_4" type="revolute">
     <xacro:damping_fingers/>
     <origin xyz="${f_pnk_xyz}" rpy="${f_pnk_rpy}" />

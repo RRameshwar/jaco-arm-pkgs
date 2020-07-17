@@ -2,9 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(jaco_description)
 
 find_package(catkin REQUIRED COMPONENTS
+  gazebo_ros
   xacro
 )
 
+find_package(gazebo REQUIRED)
+
+include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+link_directories(${GAZEBO_LIBRARY_DIRS})
 
 ###################################
 ## catkin specific configuration ##
@@ -41,18 +46,14 @@ install(DIRECTORY launch
   FILES_MATCHING PATTERN "*.launch"
 )
 
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-
-find_package(gazebo REQUIRED)
-
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
-add_library(index_contact SHARED IndexContactPlugin.cc)
+
 add_library(thumb_contact SHARED ThumbContactPlugin.cc)
+add_library(index_contact SHARED IndexContactPlugin.cc)
 add_library(middle_contact SHARED MiddleContactPlugin.cc)
 
-target_link_libraries(index_contact ${GAZEBO_libraries})
+
 target_link_libraries(thumb_contact ${GAZEBO_libraries})
+target_link_libraries(index_contact ${GAZEBO_libraries})
 target_link_libraries(middle_contact ${GAZEBO_libraries})
